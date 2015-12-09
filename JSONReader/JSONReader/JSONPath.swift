@@ -47,15 +47,6 @@ extension JSONPath {
     }
 
 
-    private static let subScriptDelimiters = NSCharacterSet(charactersInString: "`'")
-    private static let headCharacters = NSCharacterSet(charactersInString: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$_")
-    private static let bodyCharacters: NSCharacterSet = {
-        let mutableCharacterSet = NSMutableCharacterSet(charactersInString: "0123456789")
-        mutableCharacterSet.formUnionWithCharacterSet(headCharacters)
-        return mutableCharacterSet
-        }()
-
-
     private static func componentsInPath(path: String) throws -> [Component] {
         var components = [Component]()
         try JSONPath.enumerateComponentsInPath(path) { component, componentIdx, stop in
@@ -140,6 +131,13 @@ extension JSONPath {
     }
 
 
+    private static let headCharacters = NSCharacterSet(charactersInString: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$_")
+    private static let bodyCharacters: NSCharacterSet = {
+        let mutableCharacterSet = NSMutableCharacterSet(charactersInString: "0123456789")
+        mutableCharacterSet.formUnionWithCharacterSet(headCharacters)
+        return mutableCharacterSet
+        }()
+
     private static func scanIdentifierComponent(scanner: NSScanner) throws -> Component? {
         //Technically there are a lot more unicode code points that are acceptable, but we go for 99+% of JSON keys.
         //See on https://mathiasbynens.be/notes/javascript-properties.
@@ -168,7 +166,7 @@ extension JSONPath {
     }
 
 
-    private static let singleQuoteDelimittedStringDelimiters = NSCharacterSet(charactersInString:"`'")
+    private static let subScriptDelimiters = NSCharacterSet(charactersInString: "`'")
 
     private static func scanSingleQuoteDelimittedString(scanner: NSScanner, inout string: String) throws -> Bool {
 
@@ -180,7 +178,7 @@ extension JSONPath {
         mainLoop: while !scanner.atEnd {
             //Scan normal text
             var fragment: NSString?
-            let didScanFragment = scanner.scanUpToCharactersFromSet(singleQuoteDelimittedStringDelimiters, intoString:&fragment)
+            let didScanFragment = scanner.scanUpToCharactersFromSet(subScriptDelimiters, intoString:&fragment)
             if didScanFragment,
                 let fragment = fragment as? String {
                     text.appendContentsOf(fragment)
