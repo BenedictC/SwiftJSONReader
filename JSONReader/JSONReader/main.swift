@@ -26,4 +26,10 @@ let value1 = reader.valueAtPath("foo.bar.arf1") {error in return "default2"}
 let value2 = reader.valueAtPath("foo['bar'].arf2", defaultValue: "default2")
 let value3: String  = try reader.valueAtPath("arf")
 
-print(value1, value2, value3)
+//print(value1, value2, value3)
+
+let path = try! JSONPath(path: "boom[self][4].ewrgerbs....afegrsf['erthr`'nwa``ewgre']")
+
+print(path)
+print(try! JSONPath(path: "boom[self][4].ewrgerbs....afegrsf['erthr`'nwa``ewgre']"))
+print(try! JSONPath(path: "boom[self][4].ewrgerbs....afegrsf['erthr`'nwa``ewgre']"))

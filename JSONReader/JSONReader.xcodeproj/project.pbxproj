@@ -9,8 +9,11 @@
 /* Begin PBXBuildFile section */
 		8213FABA1BEE48B5006B64CE /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8213FAB91BEE48B5006B64CE /* main.swift */; };
 		8213FAC11BEE4BEF006B64CE /* JSONPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8213FAC01BEE4BEF006B64CE /* JSONPath.swift */; };
+		82BCE5651C1843CC00FF87AA /* JSONReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82BCE5641C1843CC00FF87AA /* JSONReaderTests.swift */; };
+		82BCE56B1C1843DC00FF87AA /* JSONPathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82BCE56A1C1843DC00FF87AA /* JSONPathTests.swift */; settings = {ASSET_TAGS = (); }; };
+		82BCE56C1C18446100FF87AA /* JSONReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82CB39A51C0A0A9400B6FF5A /* JSONReader.swift */; settings = {ASSET_TAGS = (); }; };
+		82BCE56D1C18446100FF87AA /* JSONPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8213FAC01BEE4BEF006B64CE /* JSONPath.swift */; settings = {ASSET_TAGS = (); }; };
 		82CB39A61C0A0A9400B6FF5A /* JSONReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82CB39A51C0A0A9400B6FF5A /* JSONReader.swift */; };
-		82F765C41C0E23190064F62D /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = 82F765C31C0E23190064F62D /* README.md */; settings = {ASSET_TAGS = (); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -29,12 +32,23 @@
 		8213FAB61BEE48B5006B64CE /* JSONReader */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = JSONReader; sourceTree = BUILT_PRODUCTS_DIR; };
 		8213FAB91BEE48B5006B64CE /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		8213FAC01BEE4BEF006B64CE /* JSONPath.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONPath.swift; sourceTree = "<group>"; };
+		82BCE5621C1843CC00FF87AA /* JSONReaderTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = JSONReaderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		82BCE5641C1843CC00FF87AA /* JSONReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONReaderTests.swift; sourceTree = "<group>"; };
+		82BCE5661C1843CC00FF87AA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		82BCE56A1C1843DC00FF87AA /* JSONPathTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONPathTests.swift; sourceTree = "<group>"; };
 		82CB39A51C0A0A9400B6FF5A /* JSONReader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONReader.swift; sourceTree = "<group>"; };
 		82F765C31C0E23190064F62D /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		8213FAB31BEE48B5006B64CE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		82BCE55F1C1843CC00FF87AA /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -49,6 +63,7 @@
 			children = (
 				82F765C31C0E23190064F62D /* README.md */,
 				8213FAB81BEE48B5006B64CE /* JSONReader */,
+				82BCE5631C1843CC00FF87AA /* JSONReaderTests */,
 				8213FAB71BEE48B5006B64CE /* Products */,
 			);
 			sourceTree = "<group>";
@@ -57,6 +72,7 @@
 			isa = PBXGroup;
 			children = (
 				8213FAB61BEE48B5006B64CE /* JSONReader */,
+				82BCE5621C1843CC00FF87AA /* JSONReaderTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -69,6 +85,16 @@
 				8213FAC01BEE4BEF006B64CE /* JSONPath.swift */,
 			);
 			path = JSONReader;
+			sourceTree = "<group>";
+		};
+		82BCE5631C1843CC00FF87AA /* JSONReaderTests */ = {
+			isa = PBXGroup;
+			children = (
+				82BCE5641C1843CC00FF87AA /* JSONReaderTests.swift */,
+				82BCE56A1C1843DC00FF87AA /* JSONPathTests.swift */,
+				82BCE5661C1843CC00FF87AA /* Info.plist */,
+			);
+			path = JSONReaderTests;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -91,6 +117,23 @@
 			productReference = 8213FAB61BEE48B5006B64CE /* JSONReader */;
 			productType = "com.apple.product-type.tool";
 		};
+		82BCE5611C1843CC00FF87AA /* JSONReaderTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 82BCE5671C1843CC00FF87AA /* Build configuration list for PBXNativeTarget "JSONReaderTests" */;
+			buildPhases = (
+				82BCE55E1C1843CC00FF87AA /* Sources */,
+				82BCE55F1C1843CC00FF87AA /* Frameworks */,
+				82BCE5601C1843CC00FF87AA /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = JSONReaderTests;
+			productName = JSONReaderTests;
+			productReference = 82BCE5621C1843CC00FF87AA /* JSONReaderTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -101,6 +144,9 @@
 				ORGANIZATIONNAME = "Benedict Cohen";
 				TargetAttributes = {
 					8213FAB51BEE48B5006B64CE = {
+						CreatedOnToolsVersion = 7.0;
+					};
+					82BCE5611C1843CC00FF87AA = {
 						CreatedOnToolsVersion = 7.0;
 					};
 				};
@@ -118,9 +164,20 @@
 			projectRoot = "";
 			targets = (
 				8213FAB51BEE48B5006B64CE /* JSONReader */,
+				82BCE5611C1843CC00FF87AA /* JSONReaderTests */,
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		82BCE5601C1843CC00FF87AA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		8213FAB21BEE48B5006B64CE /* Sources */ = {
@@ -129,8 +186,18 @@
 			files = (
 				8213FAC11BEE4BEF006B64CE /* JSONPath.swift in Sources */,
 				82CB39A61C0A0A9400B6FF5A /* JSONReader.swift in Sources */,
-				82F765C41C0E23190064F62D /* README.md in Sources */,
 				8213FABA1BEE48B5006B64CE /* main.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		82BCE55E1C1843CC00FF87AA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				82BCE56D1C18446100FF87AA /* JSONPath.swift in Sources */,
+				82BCE56B1C1843DC00FF87AA /* JSONPathTests.swift in Sources */,
+				82BCE56C1C18446100FF87AA /* JSONReader.swift in Sources */,
+				82BCE5651C1843CC00FF87AA /* JSONReaderTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -227,6 +294,32 @@
 			};
 			name = Release;
 		};
+		82BCE5681C1843CC00FF87AA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = JSONReaderTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				PRODUCT_BUNDLE_IDENTIFIER = uk.co.benedictcohen.JSONReaderTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		82BCE5691C1843CC00FF87AA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = JSONReaderTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				PRODUCT_BUNDLE_IDENTIFIER = uk.co.benedictcohen.JSONReaderTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -247,6 +340,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		82BCE5671C1843CC00FF87AA /* Build configuration list for PBXNativeTarget "JSONReaderTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				82BCE5681C1843CC00FF87AA /* Debug */,
+				82BCE5691C1843CC00FF87AA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 /* End XCConfigurationList section */
 	};
