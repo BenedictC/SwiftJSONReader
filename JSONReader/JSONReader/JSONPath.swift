@@ -10,6 +10,9 @@ import Foundation
 
 /**
 JSONPath represents a path through a tree of JSON objects.
+
+TODO: Write a grammer of a path
+
 */
 public struct JSONPath {
 
@@ -23,7 +26,7 @@ public struct JSONPath {
     public let components: [Component]
 
 
-    //MARK:- Instance life cycle
+    //MARK: Instance life cycle
 
     public init(components: [Component]) {
         self.components = components
@@ -31,7 +34,7 @@ public struct JSONPath {
 }
 
 
-//MARK: Path parsing
+//MARK:- Path parsing
 
 extension JSONPath {
 
@@ -119,7 +122,7 @@ extension JSONPath {
         case (_) where scanner.scanString("self", intoString: nil):
             result = .SelfReference
 
-        case (_) where try scanner.scanSingleQuoteDelimittedString(&text):
+        case (_) where try scanSingleQuoteDelimittedString(scanner, string: &text):
             result = .Text(text)
 
         default:
@@ -131,7 +134,7 @@ extension JSONPath {
             throw ParsingError.ExpectedEndOfSubscript
         }
 
-        scanner.consumeOptionalTraillingDot()
+        consumeOptionalTraillingDot(scanner)
 
         return result
     }
@@ -153,31 +156,68 @@ extension JSONPath {
             identifier.appendContentsOf(bodyFragment as! String)
         }
 
-        scanner.consumeOptionalTraillingDot()
+        consumeOptionalTraillingDot(scanner)
 
         return .Text(identifier)
     }
 
+    private static let dotCharacterSet = NSCharacterSet(charactersInString: ".")
 
-    /**
-    <#Description#>
-
-    - parameter text: <#text description#>
-
-    - returns: <#return value description#>
-    */
-    static func encodeTextAsSubscriptPathComponent(text: String) -> String {
-        let mutableText =  NSMutableString(string: text)
-        //Note that the order of the replacements is significant. We must replace '`' first otherwise our replacements will get replaced.
-        mutableText.replaceOccurrencesOfString("`", withString: "``", options: [], range: NSRange(location: 0, length: mutableText.length))
-        mutableText.replaceOccurrencesOfString("'", withString: "`'", options: [], range: NSRange(location: 0, length: mutableText.length))
-
-        return "['\(mutableText)']"
+    private static func consumeOptionalTraillingDot(scanner: NSScanner) {
+        scanner.scanCharactersFromSet(dotCharacterSet, intoString: nil)
     }
+
+
+    private static let singleQuoteDelimittedStringDelimiters = NSCharacterSet(charactersInString:"`'")
+
+    private static func scanSingleQuoteDelimittedString(scanner: NSScanner, inout string: String) throws -> Bool {
+
+        guard scanner.scanString("'", intoString: nil) else {
+            return false
+        }
+
+        var text = ""
+        mainLoop: while !scanner.atEnd {
+            //Scan normal text
+            var fragment: NSString?
+            let didScanFragment = scanner.scanUpToCharactersFromSet(singleQuoteDelimittedStringDelimiters, intoString:&fragment)
+            if didScanFragment,
+                let fragment = fragment as? String {
+                    text.appendContentsOf(fragment)
+            }
+
+            //Scan escape sequences
+            escapeSequenceLoop: while true {
+                if scanner.scanString("`'", intoString: nil) {
+                    text.appendContentsOf("'")
+                } else if scanner.scanString("``", intoString: nil) {
+                    text.appendContentsOf("`")
+                } else if scanner.scanString("`", intoString: nil) {
+                    text.appendContentsOf("`") //This is technically an invalid escape sequence but we're forgiving.
+                } else {
+                    break escapeSequenceLoop
+                }
+            }
+
+            //Attempt to scan the closing delimiter
+            if scanner.scanString("'", intoString: nil) {
+                //Done!
+                string = text
+                return true
+            }
+        }
+
+        throw JSONPath.ParsingError.UnexpectedEndOfString
+    }
+}
+
+
+//MARK:- Initialization from string
+
+extension JSONPath {
 
     /// A cache of the values of each component of a path. The key is the path and the value is an array of NSNumber, NSString and NSNull which represent .Numeric, .Text and .SelfReference respectively.
     private static let componentsCache = NSCache()
-
 
     public init(path: String) throws {
         let components: [Component]
@@ -217,10 +257,9 @@ extension JSONPath {
             })
             JSONPath.componentsCache.setObject(componentsArray, forKey: path)
         }
-        
+
         self.init(components: components)
     }
-
 }
 
 
@@ -263,82 +302,46 @@ extension JSONPath: StringLiteralConvertible {
 //MARK:- Description
 
 extension JSONPath: CustomDebugStringConvertible {
-
+    
     public var debugDescription: String {
         var description = ""
-
+        
         for component in components {
             switch component {
             case .Text(let text):
                 description += "['\(text)']"
                 break
-
+                
             case .Numeric(let number):
                 description += "[\(number)]"
-
+                
             case .SelfReference:
                 description += "[self]"
             }
         }
-
+        
         return description
     }
 }
 
 
-//MARK: NSScanner parsing extension
+//MARK:- String encoding
 
-extension NSScanner {
+extension JSONPath {
 
+    /**
+    <#Description#>
 
-    private static let dotCharacterSet = NSCharacterSet(charactersInString: ".")
+    - parameter text: <#text description#>
 
-    private func consumeOptionalTraillingDot() {
-        scanCharactersFromSet(NSScanner.dotCharacterSet, intoString: nil)
-    }
+    - returns: <#return value description#>
+    */
+    public static func encodeTextAsSubscriptPathComponent(text: String) -> String {
+        let mutableText =  NSMutableString(string: text)
+        //Note that the order of the replacements is significant. We must replace '`' first otherwise our replacements will get replaced.
+        mutableText.replaceOccurrencesOfString("`", withString: "``", options: [], range: NSRange(location: 0, length: mutableText.length))
+        mutableText.replaceOccurrencesOfString("'", withString: "`'", options: [], range: NSRange(location: 0, length: mutableText.length))
 
-
-    private static let singleQuoteDelimittedStringDelimiters = NSCharacterSet(charactersInString:"`'")
-
-    private func scanSingleQuoteDelimittedString(inout string: String) throws -> Bool {
-
-        guard scanString("'", intoString: nil) else {
-            return false
-        }
-
-        var text = ""
-        mainLoop: while !atEnd {
-            //Scan normal text
-            var fragment: NSString?
-            let didScanFragment = scanUpToCharactersFromSet(NSScanner.singleQuoteDelimittedStringDelimiters, intoString:&fragment)
-            if didScanFragment,
-                let fragment = fragment as? String {
-                    text.appendContentsOf(fragment)
-            }
-
-            //Scan escape sequences
-            escapeSequenceLoop: while true {
-                if scanString("`'", intoString: nil) {
-                    text.appendContentsOf("'")
-                } else
-                    if scanString("``", intoString: nil) {
-                        text.appendContentsOf("`")
-                    } else
-                        if scanString("`", intoString: nil) {
-                            text.appendContentsOf("`") //This is technically an invalid escape sequence but we're forgiving.
-                        } else {
-                            break escapeSequenceLoop
-                }
-            }
-
-            //Attempt to scan the closing delimiter
-            if scanString("'", intoString: nil) {
-                //Done!
-                string = text
-                return true
-            }
-        }
-        
-        throw JSONPath.ParsingError.UnexpectedEndOfString
+        return "['\(mutableText)']"
     }
 }
