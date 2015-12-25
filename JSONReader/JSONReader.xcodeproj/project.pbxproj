@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		8213FABA1BEE48B5006B64CE /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8213FAB91BEE48B5006B64CE /* main.swift */; };
 		8213FAC11BEE4BEF006B64CE /* JSONPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8213FAC01BEE4BEF006B64CE /* JSONPath.swift */; };
+		82494A6E1C2DE52E0024A3A9 /* JSONPathTestWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82494A6D1C2DE52E0024A3A9 /* JSONPathTestWrapper.swift */; settings = {ASSET_TAGS = (); }; };
 		82BCE5651C1843CC00FF87AA /* JSONReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82BCE5641C1843CC00FF87AA /* JSONReaderTests.swift */; };
 		82BCE56B1C1843DC00FF87AA /* JSONPathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82BCE56A1C1843DC00FF87AA /* JSONPathTests.swift */; settings = {ASSET_TAGS = (); }; };
 		82BCE56C1C18446100FF87AA /* JSONReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82CB39A51C0A0A9400B6FF5A /* JSONReader.swift */; settings = {ASSET_TAGS = (); }; };
@@ -32,6 +33,7 @@
 		8213FAB61BEE48B5006B64CE /* JSONReader */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = JSONReader; sourceTree = BUILT_PRODUCTS_DIR; };
 		8213FAB91BEE48B5006B64CE /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		8213FAC01BEE4BEF006B64CE /* JSONPath.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONPath.swift; sourceTree = "<group>"; };
+		82494A6D1C2DE52E0024A3A9 /* JSONPathTestWrapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONPathTestWrapper.swift; sourceTree = "<group>"; };
 		82BCE5621C1843CC00FF87AA /* JSONReaderTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = JSONReaderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		82BCE5641C1843CC00FF87AA /* JSONReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONReaderTests.swift; sourceTree = "<group>"; };
 		82BCE5661C1843CC00FF87AA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -92,6 +94,7 @@
 			children = (
 				82BCE5641C1843CC00FF87AA /* JSONReaderTests.swift */,
 				82BCE56A1C1843DC00FF87AA /* JSONPathTests.swift */,
+				82494A6D1C2DE52E0024A3A9 /* JSONPathTestWrapper.swift */,
 				82BCE5661C1843CC00FF87AA /* Info.plist */,
 			);
 			path = JSONReaderTests;
@@ -195,6 +198,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				82BCE56D1C18446100FF87AA /* JSONPath.swift in Sources */,
+				82494A6E1C2DE52E0024A3A9 /* JSONPathTestWrapper.swift in Sources */,
 				82BCE56B1C1843DC00FF87AA /* JSONPathTests.swift in Sources */,
 				82BCE56C1C18446100FF87AA /* JSONReader.swift in Sources */,
 				82BCE5651C1843CC00FF87AA /* JSONReaderTests.swift in Sources */,
@@ -348,6 +352,7 @@
 				82BCE5691C1843CC00FF87AA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

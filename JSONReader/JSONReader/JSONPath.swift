@@ -14,14 +14,24 @@ JSONPath represents a path through a tree of JSON objects.
 TODO: Write a grammer of a path
 
 */
-public struct JSONPath {
+public struct JSONPath: Equatable {
 
-    public enum Component {
+    public enum Component: Equatable {
         case Text(String)
         case Numeric(Int64)
         case SelfReference
-    }
 
+        private func asTuple()-> (text: String?, number: Int64?, isSelfReference: Bool) {
+            switch self {
+            case .Text(let text):
+                return (text, nil, false)
+            case .Numeric(let number):
+                return (nil, number, false)
+            case .SelfReference:
+                return (nil, nil, true)
+            }
+        }
+    }
 
     public let components: [Component]
 
@@ -31,6 +41,21 @@ public struct JSONPath {
     public init(components: [Component]) {
         self.components = components
     }
+}
+
+
+public func ==(lhs: JSONPath.Component, rhs: JSONPath.Component) -> Bool {
+    let lhsValues = lhs.asTuple()
+    let rhsValues = rhs.asTuple()
+
+    return lhsValues.text == rhsValues.text &&
+           lhsValues.number == rhsValues.number &&
+           lhsValues.isSelfReference == rhsValues.isSelfReference
+}
+
+
+public func ==(lhs: JSONPath, rhs: JSONPath) -> Bool {
+    return lhs.components == rhs.components
 }
 
 
