@@ -226,6 +226,10 @@ extension JSONReader {
 
 public func ==(lhs: JSONReader, rhs: JSONReader) -> Bool {
 
+    if lhs.isEmpty && rhs.isEmpty {
+        return true
+    }
+
     if let
         left:  NSArray = lhs.value(),
         right: NSArray = rhs.value() {

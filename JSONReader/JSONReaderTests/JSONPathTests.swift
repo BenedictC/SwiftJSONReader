@@ -102,27 +102,27 @@ class JSONPathPerformanceTests: XCTestCase {
 
     //MARK:- Caching path performance
 
-    func testInitWithCache() {
-        // This is an example of a performance test case.
-        self.measureBlock {
-            for _ in 0...10000 {
-                let _ = try! JSONPath(path: "boom[self][4].ewrgerbs....afegrsf['erthr`'nwa``ewgre']")
-            }
-        }
-    }
-
-
-    func testInitWithoutCache() {
-        // This is an example of a performance test case.
-        self.measureBlock {
-            for _ in 0...10000 {
-                var components: [JSONPath.Component] = []
-                try! JSONPath.enumerateComponentsInPath("boom[self][4].ewrgerbs....afegrsf['erthr`'nwa``ewgre']") { component, _, _ in
-                    components.append(component)
-                }
-                let _ = JSONPath(components: components)
-            }
-        }
-    }
+//    func testInitWithCache() {
+//        // This is an example of a performance test case.
+//        self.measureBlock {
+//            for _ in 0...10000 {
+//                let _ = try! JSONPath(path: "boom[self][4].ewrgerbs....afegrsf['erthr`'nwa``ewgre']")
+//            }
+//        }
+//    }
+//
+//
+//    func testInitWithoutCache() {
+//        // This is an example of a performance test case.
+//        self.measureBlock {
+//            for _ in 0...10000 {
+//                var components: [JSONPath.Component] = []
+//                try! JSONPath.enumerateComponentsInPath("boom[self][4].ewrgerbs....afegrsf['erthr`'nwa``ewgre']") { component, _, _ in
+//                    components.append(component)
+//                }
+//                let _ = JSONPath(components: components)
+//            }
+//        }
+//    }
 
 }
