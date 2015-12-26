@@ -7,9 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		8213FABA1BEE48B5006B64CE /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8213FAB91BEE48B5006B64CE /* main.swift */; };
 		8213FAC11BEE4BEF006B64CE /* JSONPath.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8213FAC01BEE4BEF006B64CE /* JSONPath.swift */; };
 		82494A6E1C2DE52E0024A3A9 /* JSONPathTestWrapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82494A6D1C2DE52E0024A3A9 /* JSONPathTestWrapper.swift */; settings = {ASSET_TAGS = (); }; };
+		82494A741C2F06530024A3A9 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82494A721C2F06400024A3A9 /* main.swift */; settings = {ASSET_TAGS = (); }; };
 		82BCE5651C1843CC00FF87AA /* JSONReaderTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82BCE5641C1843CC00FF87AA /* JSONReaderTests.swift */; };
 		82BCE56B1C1843DC00FF87AA /* JSONPathTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82BCE56A1C1843DC00FF87AA /* JSONPathTests.swift */; settings = {ASSET_TAGS = (); }; };
 		82BCE56C1C18446100FF87AA /* JSONReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82CB39A51C0A0A9400B6FF5A /* JSONReader.swift */; settings = {ASSET_TAGS = (); }; };
@@ -30,10 +30,11 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		8213FAB61BEE48B5006B64CE /* JSONReader */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = JSONReader; sourceTree = BUILT_PRODUCTS_DIR; };
-		8213FAB91BEE48B5006B64CE /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		8213FAB61BEE48B5006B64CE /* DemoApp */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = DemoApp; sourceTree = BUILT_PRODUCTS_DIR; };
 		8213FAC01BEE4BEF006B64CE /* JSONPath.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONPath.swift; sourceTree = "<group>"; };
 		82494A6D1C2DE52E0024A3A9 /* JSONPathTestWrapper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = JSONPathTestWrapper.swift; sourceTree = "<group>"; };
+		82494A701C2F05E10024A3A9 /* JSONReader.podspec */ = {isa = PBXFileReference; lastKnownFileType = text; path = JSONReader.podspec; sourceTree = "<group>"; };
+		82494A721C2F06400024A3A9 /* main.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		82BCE5621C1843CC00FF87AA /* JSONReaderTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = JSONReaderTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		82BCE5641C1843CC00FF87AA /* JSONReaderTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONReaderTests.swift; sourceTree = "<group>"; };
 		82BCE5661C1843CC00FF87AA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -63,7 +64,9 @@
 		8213FAAD1BEE48B5006B64CE = {
 			isa = PBXGroup;
 			children = (
+				82494A701C2F05E10024A3A9 /* JSONReader.podspec */,
 				82F765C31C0E23190064F62D /* README.md */,
+				82494A711C2F06400024A3A9 /* DemoApp */,
 				8213FAB81BEE48B5006B64CE /* JSONReader */,
 				82BCE5631C1843CC00FF87AA /* JSONReaderTests */,
 				8213FAB71BEE48B5006B64CE /* Products */,
@@ -73,7 +76,7 @@
 		8213FAB71BEE48B5006B64CE /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				8213FAB61BEE48B5006B64CE /* JSONReader */,
+				8213FAB61BEE48B5006B64CE /* DemoApp */,
 				82BCE5621C1843CC00FF87AA /* JSONReaderTests.xctest */,
 			);
 			name = Products;
@@ -82,11 +85,18 @@
 		8213FAB81BEE48B5006B64CE /* JSONReader */ = {
 			isa = PBXGroup;
 			children = (
-				8213FAB91BEE48B5006B64CE /* main.swift */,
 				82CB39A51C0A0A9400B6FF5A /* JSONReader.swift */,
 				8213FAC01BEE4BEF006B64CE /* JSONPath.swift */,
 			);
 			path = JSONReader;
+			sourceTree = "<group>";
+		};
+		82494A711C2F06400024A3A9 /* DemoApp */ = {
+			isa = PBXGroup;
+			children = (
+				82494A721C2F06400024A3A9 /* main.swift */,
+			);
+			path = DemoApp;
 			sourceTree = "<group>";
 		};
 		82BCE5631C1843CC00FF87AA /* JSONReaderTests */ = {
@@ -103,9 +113,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		8213FAB51BEE48B5006B64CE /* JSONReader */ = {
+		8213FAB51BEE48B5006B64CE /* DemoApp */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 8213FABD1BEE48B5006B64CE /* Build configuration list for PBXNativeTarget "JSONReader" */;
+			buildConfigurationList = 8213FABD1BEE48B5006B64CE /* Build configuration list for PBXNativeTarget "DemoApp" */;
 			buildPhases = (
 				8213FAB21BEE48B5006B64CE /* Sources */,
 				8213FAB31BEE48B5006B64CE /* Frameworks */,
@@ -115,9 +125,9 @@
 			);
 			dependencies = (
 			);
-			name = JSONReader;
+			name = DemoApp;
 			productName = JSONReader;
-			productReference = 8213FAB61BEE48B5006B64CE /* JSONReader */;
+			productReference = 8213FAB61BEE48B5006B64CE /* DemoApp */;
 			productType = "com.apple.product-type.tool";
 		};
 		82BCE5611C1843CC00FF87AA /* JSONReaderTests */ = {
@@ -166,7 +176,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				8213FAB51BEE48B5006B64CE /* JSONReader */,
+				8213FAB51BEE48B5006B64CE /* DemoApp */,
 				82BCE5611C1843CC00FF87AA /* JSONReaderTests */,
 			);
 		};
@@ -189,7 +199,7 @@
 			files = (
 				8213FAC11BEE4BEF006B64CE /* JSONPath.swift in Sources */,
 				82CB39A61C0A0A9400B6FF5A /* JSONReader.swift in Sources */,
-				8213FABA1BEE48B5006B64CE /* main.swift in Sources */,
+				82494A741C2F06530024A3A9 /* main.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -336,7 +346,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		8213FABD1BEE48B5006B64CE /* Build configuration list for PBXNativeTarget "JSONReader" */ = {
+		8213FABD1BEE48B5006B64CE /* Build configuration list for PBXNativeTarget "DemoApp" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				8213FABE1BEE48B5006B64CE /* Debug */,
