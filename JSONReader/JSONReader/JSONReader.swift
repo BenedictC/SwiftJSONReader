@@ -9,7 +9,7 @@
 import Foundation
 
 
-public class JSONReader {
+public final class JSONReader: Equatable {
 
     //MARK:- Errors
 
@@ -29,19 +29,20 @@ public class JSONReader {
 
     //MARK:- Instance life cycle
 
-    convenience public init(data: NSData, options: NSJSONReadingOptions = [.AllowFragments]) throws {
+    convenience public init(data: NSData, allowFragments: Bool = false) throws {
+        let options: NSJSONReadingOptions = allowFragments ? [NSJSONReadingOptions.AllowFragments] : []
         let object = try NSJSONSerialization.JSONObjectWithData(data, options: options)
         self.init(object: object)
     }
 
 
-    public init(object: AnyObject) {
+    public init(object: AnyObject?) {
         self.object = object
     }
 
 
-    private init() {
-        self.object = nil
+    private convenience init() {
+        self.init(object: nil)
     }
 
 
@@ -69,27 +70,26 @@ public class JSONReader {
 
     //MARK:- Element access
 
-    public func isValidIndex(relativeIndex: Int64) -> Bool {
+    public func isValidIndex(relativeIndex: Int) -> Bool {
         return absoluteIndexForRelativeIndex(relativeIndex) != nil
     }
 
 
-    private func absoluteIndexForRelativeIndex(relativeIndex: Int64) -> Int? {
-        guard let collection = object as? [Any] else {
+    private func absoluteIndexForRelativeIndex(relativeIndex: Int) -> Int? {
+        guard let array = object as? NSArray else {
             return nil
         }
 
-        let count = collection.count
+        let count = array.count
         let shouldInvertIndex = relativeIndex < 0
-        let index64 = shouldInvertIndex ? count + relativeIndex : relativeIndex
-        let index = Int(index64)
+        let index = shouldInvertIndex ? count + relativeIndex : relativeIndex
 
-        let isInRange = index >= collection.startIndex && index <= collection.endIndex
+        let isInRange = index >= 0 && index < count
         return isInRange ? index : nil
     }
 
 
-    public subscript(relativeIndex: Int64) -> JSONReader {
+    public subscript(relativeIndex: Int) -> JSONReader {
         guard let index = absoluteIndexForRelativeIndex(relativeIndex),
               let collection = object as? [AnyObject] else {
             return JSONReader()
@@ -100,7 +100,7 @@ public class JSONReader {
 
 
     public func isValidKey(key: String) -> Bool {
-        guard let collection = object as? [String: Any] else {
+        guard let collection = object as? NSDictionary else {
             return false
         }
 
@@ -154,7 +154,7 @@ extension JSONReader {
                 }
 
                 //Check the index is valid
-                guard let index = absoluteIndexForRelativeIndex(number) else {
+                guard let index = absoluteIndexForRelativeIndex(Int(number)) else {
                     //TODO: The erro should be invalidIndex
                     let error = JSONPathError.InvalidSubscript(path, componentsErrorStack)
                     return try errorHandler(error)
@@ -221,4 +221,40 @@ extension JSONReader {
 
         return JSONReader(object: object)
     }
+}
+
+
+public func ==(lhs: JSONReader, rhs: JSONReader) -> Bool {
+
+    if let
+        left:  NSArray = lhs.value(),
+        right: NSArray = rhs.value() {
+            return left == right
+    }
+
+    if let
+        left:  NSDictionary = lhs.value(),
+        right: NSDictionary = rhs.value() {
+            return left == right
+    }
+
+    if let
+        left:  NSString = lhs.value(),
+        right: NSString = rhs.value() {
+            return left == right
+    }
+
+    if let
+        left:  NSNull = lhs.value(),
+        right: NSNull = rhs.value() {
+            return left == right
+    }
+
+    if let
+        left:  NSNumber = lhs.value(),
+        right: NSNumber = rhs.value() {
+            return left == right
+    }
+
+    return false
 }
