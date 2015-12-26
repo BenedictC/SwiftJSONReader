@@ -17,7 +17,7 @@ Pod::Spec.new do |s|
 
   s.name         = "JSONReader"
   s.version      = "0.1"
-  s.summary      = "A short description of JSONReader."
+  s.summary      = "JSONReader is a handy class for type checked access to JSON data using JSON paths."
 
   # This description is used to generate tags and improve search results.
   #   * Think: What does it do? Why did you write it? What is the focus?
@@ -25,9 +25,10 @@ Pod::Spec.new do |s|
   #   * Write the description between the DESC delimiters below.
   #   * Finally, don't worry about the indent, CocoaPods strips it!
   s.description  = <<-DESC
+JSONReader provides type checked access to a JSON object using JSON paths. JSONReader reduces the amount of boiler plate code required to safely handle JSON and makes it easy to handle errors.
                    DESC
 
-  s.homepage     = "http://github.com/benedictc/SwiftJSONReader"
+  s.homepage     = "https://github.com/benedictc/SwiftJSONReader"
 
 
   # ―――  Spec License  ――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -51,9 +52,7 @@ Pod::Spec.new do |s|
   #
 
   s.author             = { "Benedict Cohen" => "ben@benedictcohen.co.uk" }
-  # Or just: s.author    = "Benedict Cohen"
-  # s.authors            = { "Benedict Cohen" => "ben@benedictcohen.co.uk" }
-  # s.social_media_url   = "http://twitter.com/Benedict Cohen"
+  s.social_media_url   = "https://twitter.com/BenedictC"
 
   # ――― Platform Specifics ――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
   #
@@ -65,10 +64,10 @@ Pod::Spec.new do |s|
   # s.platform     = :ios, "5.0"
 
   #  When using multiple platforms
-  # s.ios.deployment_target = "5.0"
-  # s.osx.deployment_target = "10.7"
-  # s.watchos.deployment_target = "2.0"
-  # s.tvos.deployment_target = "9.0"
+  s.ios.deployment_target = "8.0"
+  s.osx.deployment_target = "10.12"
+  s.watchos.deployment_target = "2.0"
+  s.tvos.deployment_target = "9.0"
 
 
   # ――― Source Location ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -77,7 +76,7 @@ Pod::Spec.new do |s|
   #  Supports git, hg, bzr, svn and HTTP.
   #
 
-  s.source       = { :git => "http://github.com/benedictc/SwiftJSONReader.git", :tag => "0.1" }
+  s.source       = { :git => "https://github.com/benedictc/SwiftJSONReader.git", :tag => "0.1" }
 
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
@@ -88,8 +87,6 @@ Pod::Spec.new do |s|
   #  Not including the public_header_files will make all headers public.
   #
 
-  s.source_files  = "JSONReader", "Classes/**/*.swift"
-  # s.exclude_files = "Classes/Exclude"
-
+  s.source_files  = "JSONReader/JSONReader/*.swift"
 
 end
