@@ -418,10 +418,54 @@ class JSONReaderJSONPathTests: XCTestCase {
     }
 
 
-    func testValueAtPathWithErrorHandler() {
-        //TODO: Happy path
-        //TODO: Missing value
-        //TODO: Wrong type
+    func testValueAtPathWithErrorHandlerHappy() {
+        //Given
+        let key = "foo"
+        let value = "bar"
+        let dict = [key: value]
+        let expected = value
+        let invalid = value + value
+        let reader = JSONReader(object: dict)
+
+        //When
+        let actual: String = reader.valueAtPath("foo", errorHandler: {error in return invalid})
+
+        //Then
+        XCTAssertEqual(actual, expected)
+    }
+
+
+    func testValueAtPathWithErrorHandlerMissingValue() {
+        //Given
+        let key = "foo"
+        let value = "bar"
+        let dict = [key: value]
+        let invalid = value + value
+        let expected = invalid
+        let reader = JSONReader(object: dict)
+
+        //When
+        let actual: String = reader.valueAtPath("aegrsbf", errorHandler: {error in return invalid})
+
+        //Then
+        XCTAssertEqual(actual, expected)
+    }
+
+
+    func testValueAtPathWithErrorHandlerWrongType() {
+        //Given
+        let key = "foo"
+        let value = 876543
+        let dict = [key: value]
+        let invalid = "invalid"
+        let expected = invalid
+        let reader = JSONReader(object: dict)
+
+        //When
+        let actual: String = reader.valueAtPath("aegrsbf", errorHandler: {error in return invalid})
+
+        //Then
+        XCTAssertEqual(actual, expected)
     }
 
 
