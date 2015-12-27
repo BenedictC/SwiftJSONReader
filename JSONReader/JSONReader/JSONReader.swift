@@ -20,9 +20,9 @@ public final class JSONReader: Equatable {
 
 
     /// The object to attempt to fetch values from
-    let object: Any?
+    public let object: Any?
 
-    var isEmpty: Bool {
+    public var isEmpty: Bool {
         return object == nil
     }
 
@@ -125,11 +125,11 @@ extension JSONReader {
 
     public enum JSONPathError: ErrorType {
         public typealias JSONPathComponentsStack = [(JSONPath.Component, Any?)]
-        case UnexpectedType(JSONPath, JSONPathComponentsStack, Any.Type)
+        case UnexpectedType(path: JSONPath, componentStack: JSONPathComponentsStack, Any.Type)
         //"Unexpected type while fetching value for path $PATH:\n
         //$i: $COMPONENT_VALUE ($COMPONENT_TYPE) -> $VALUE_TYPE\n"
-        case InvalidSubscript(JSONPath, JSONPathComponentsStack)
-        case MissingValue(JSONPath)
+        case InvalidSubscript(path: JSONPath, componentStack: JSONPathComponentsStack)
+        case MissingValue(path: JSONPath)
     }
 
 
@@ -154,27 +154,27 @@ extension JSONReader {
             case .Numeric(let number):
                 //Check the collection is valid
                 guard let array = untypedValue as? NSArray else {
-                    let error = JSONPathError.UnexpectedType(path, componentsErrorStack, NSArray.self)
+                    let error = JSONPathError.UnexpectedType(path: path, componentStack: componentsErrorStack, NSArray.self)
                     return try errorHandler(error)
                 }
 
                 //Check the index is valid
                 guard let index = absoluteIndexForRelativeIndex(Int(number)) else {
                     //TODO: The erro should be invalidIndex
-                    let error = JSONPathError.InvalidSubscript(path, componentsErrorStack)
+                    let error = JSONPathError.InvalidSubscript(path: path, componentStack: componentsErrorStack)
                     return try errorHandler(error)
                 }
                 untypedValue = array[index]
 
             case .Text(let key):
                 guard let dict = untypedValue as? NSDictionary else {
-                    let error = JSONPathError.UnexpectedType(path, componentsErrorStack, NSDictionary.self)
+                    let error = JSONPathError.UnexpectedType(path: path, componentStack: componentsErrorStack, NSDictionary.self)
                     return try errorHandler(error)
                 }
 
                 //Check the index is valid
                 guard let element = dict[key] else {
-                    let error = JSONPathError.InvalidSubscript(path, componentsErrorStack)
+                    let error = JSONPathError.InvalidSubscript(path: path, componentStack: componentsErrorStack)
                     return try errorHandler(error)
                 }
                 untypedValue = element
@@ -187,7 +187,7 @@ extension JSONReader {
         }
 
         guard let value = untypedValue as? T else {
-            let error = JSONPathError.UnexpectedType(path, componentsErrorStack, T.self)
+            let error = JSONPathError.UnexpectedType(path: path, componentStack: componentsErrorStack, T.self)
             return try errorHandler(error)
         }
 
@@ -201,7 +201,7 @@ extension JSONReader {
         
         guard let value = try optionalValueAtPath(path, substituteNSNullWithNil: false, errorHandler: { try errorHandler($0) }) else {
             //- if nil -> missing value error and return
-            return try errorHandler(.MissingValue(path))
+            return try errorHandler(.MissingValue(path: path))
         }
         return value
     }
@@ -222,7 +222,7 @@ extension JSONReader {
     public func readerAtPath(path: JSONPath, errorHandler: (JSONPathError) throws -> JSONReader = { throw $0 } ) rethrows -> JSONReader {
         let value: Any? = try optionalValueAtPath(path, substituteNSNullWithNil: false, errorHandler: errorHandler)
         guard let object = value else {
-            return try errorHandler(.MissingValue(path))
+            return try errorHandler(.MissingValue(path: path))
         }
 
         return JSONReader(object: object)
