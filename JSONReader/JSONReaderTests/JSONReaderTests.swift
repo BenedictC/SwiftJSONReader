@@ -418,19 +418,56 @@ class JSONReaderJSONPathTests: XCTestCase {
     }
 
 
-    /*
-
-    @rethrows public func valueAtPath<T>(path: JSONPath, errorHandler: (JSONPathError) throws -> T) rethrows -> T
-
-
-    public func valueAtPath<T>(path: JSONPath, defaultValue: T) -> T
-
-
-    public func valueAtPath<T>(path: JSONPath) throws -> T
+    func testValueAtPathWithErrorHandler() {
+        //TODO: Happy path
+        //TODO: Missing value
+        //TODO: Wrong type
+    }
 
 
-    @rethrows public func readerAtPath(path: JSONPath, errorHandler: (JSONPathError) throws -> JSONReader = default) rethrows -> JSONReader.JSONReader
-*/
+    func testValueAtPathWithDefaultValue() {
+        //TODO: Happy path
+        //TODO: Missing value
+        //TODO: Wrong type
+    }
+
+
+    func testReaderAtPathValid() {
+        //Given
+        let value = true
+        let dict = ["key": value]
+        let reader = JSONReader(object: dict)
+
+        //When
+        let actual = (try? reader.readerAtPath("key")) ?? JSONReader(object: nil)
+
+        //Then
+        let expected = JSONReader(object: value)
+        XCTAssertEqual(actual, expected)
+    }
+
+
+    func testReaderAtPathInvalid() {
+        //Given
+        let dict = ["key": "value"]
+        let reader = JSONReader(object: dict)
+
+        //When
+        let actual: JSONReader?
+        let actualError: ErrorType?
+        do {
+            actual = try reader.readerAtPath("arf")
+            actualError = nil
+        } catch {
+            actualError = error
+            actual = nil
+        }
+
+        //Then
+        XCTAssertNotNil(actualError)
+        XCTAssertNil(actual)
+    }
+
 
     //TODO: Test errors are of expected value
     //TODO: 64 bit number edge cases

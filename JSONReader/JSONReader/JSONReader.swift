@@ -20,7 +20,7 @@ public final class JSONReader: Equatable {
 
 
     /// The object to attempt to fetch values from
-    let object: AnyObject?
+    let object: Any?
 
     var isEmpty: Bool {
         return object == nil
@@ -36,7 +36,7 @@ public final class JSONReader: Equatable {
     }
 
 
-    public init(object: AnyObject?) {
+    public init(object: Any?) {
         self.object = object
     }
 
@@ -91,7 +91,7 @@ public final class JSONReader: Equatable {
 
     public subscript(relativeIndex: Int) -> JSONReader {
         guard let index = absoluteIndexForRelativeIndex(relativeIndex),
-              let collection = object as? [AnyObject] else {
+              let collection = object as? NSArray else {
             return JSONReader()
         }
 
@@ -109,7 +109,7 @@ public final class JSONReader: Equatable {
 
 
     public subscript(key: String) -> JSONReader {
-        guard let collection = object as? [String: AnyObject],
+        guard let collection = object as? NSDictionary,
               let element = collection[key] else {
             return JSONReader()
         }
@@ -124,7 +124,7 @@ public final class JSONReader: Equatable {
 extension JSONReader {
 
     public enum JSONPathError: ErrorType {
-        public typealias JSONPathComponentsStack = [(JSONPath.Component, AnyObject?)]
+        public typealias JSONPathComponentsStack = [(JSONPath.Component, Any?)]
         case UnexpectedType(JSONPath, JSONPathComponentsStack, Any.Type)
         //"Unexpected type while fetching value for path $PATH:\n
         //$i: $COMPONENT_VALUE ($COMPONENT_TYPE) -> $VALUE_TYPE\n"
@@ -141,7 +141,7 @@ extension JSONReader {
 
     
     public func optionalValueAtPath<T>(path: JSONPath, substituteNSNullWithNil: Bool = true, errorHandler: ((JSONPathError) throws -> T?)) rethrows -> T? {
-        var untypedValue: AnyObject? = object
+        var untypedValue: Any? = object
         var componentsErrorStack = JSONPathError.JSONPathComponentsStack()
 
         for component in path.components {
@@ -220,7 +220,8 @@ extension JSONReader {
     //MARK:- Reader fetching
 
     public func readerAtPath(path: JSONPath, errorHandler: (JSONPathError) throws -> JSONReader = { throw $0 } ) rethrows -> JSONReader {
-        guard let object = try optionalValueAtPath(path, substituteNSNullWithNil: false, errorHandler: errorHandler) else {
+        let value: Any? = try optionalValueAtPath(path, substituteNSNullWithNil: false, errorHandler: errorHandler)
+        guard let object = value else {
             return try errorHandler(.MissingValue(path))
         }
 
