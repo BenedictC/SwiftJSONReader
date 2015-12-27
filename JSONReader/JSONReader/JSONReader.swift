@@ -135,7 +135,12 @@ extension JSONReader {
 
     //MARK:- Optional value fetching
 
-    public func optionalValueAtPath<T>(path: JSONPath, substituteNSNullWithNil: Bool = true, errorHandler: (JSONPathError) throws -> T? = { _ in return nil } ) rethrows -> T? {
+    public func optionalValueAtPath<T>(path: JSONPath, substituteNSNullWithNil: Bool = true) -> T? {
+        return optionalValueAtPath(path, substituteNSNullWithNil: substituteNSNullWithNil, errorHandler: { _ in return nil })
+    }
+
+    
+    public func optionalValueAtPath<T>(path: JSONPath, substituteNSNullWithNil: Bool = true, errorHandler: ((JSONPathError) throws -> T?)) rethrows -> T? {
         var untypedValue: AnyObject? = object
         var componentsErrorStack = JSONPathError.JSONPathComponentsStack()
 

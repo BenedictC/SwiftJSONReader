@@ -11,15 +11,10 @@ import XCTest
 
 class JSONReaderTests: XCTestCase {
 
-    let object = [
-        "array": ["string", 2, NSNull(), 4.4, [], true],
-        "number": NSNumber(integer: 5), //If we use NSNumber(float:) then the comparision fails. Strange.
-        "string": "Boo!"
-    ]
-    lazy var reader: JSONReader = JSONReader(object: self.object)
-
-
     func testObjectProperty() {
+        //Given
+        let reader = JSONReader(object: [])
+
         //Valid object
         XCTAssertNotNil(reader.object)
         XCTAssertFalse(reader.isEmpty)
@@ -33,7 +28,7 @@ class JSONReaderTests: XCTestCase {
 
     func testInitWithJSONValidData() {
         //Given
-        let expected: NSDictionary = object
+        let expected = ["foo": "bar"] as NSDictionary
         let data = (try? NSJSONSerialization.dataWithJSONObject(expected, options: [])) ?? NSData()
 
         //When
@@ -323,10 +318,107 @@ class JSONReaderTests: XCTestCase {
 
 class JSONReaderJSONPathTests: XCTestCase {
 
-/*
+    func testOptionalValueAtPathWithValidValue() {
+        //Given
+        let key = "foo"
+        let value = "bar"
+        let dict = [key: value]
+        let invalid = "invalid"
+        let expected = value
+        let reader = JSONReader(object: dict)
 
-    @rethrows public func optionalValueAtPath<T>(path: JSONPath, substituteNSNullWithNil: Bool = default, errorHandler: (JSONPathError) throws -> T? = default) rethrows -> T?
+        //When
+        let actual = reader.optionalValueAtPath("foo") ?? invalid
 
+        //Then
+        XCTAssertEqual(actual, expected)
+    }
+
+
+    func testOptionalValueAtPathWithMissingValue() {
+        //Given
+        let key = "foo"
+        let value = 500
+        let dict = [key: value]
+        let invalid = "invalid"
+        let expectedValue = invalid
+        let reader = JSONReader(object: dict)
+
+        //When
+        let actualValue: String
+        let actualError: ErrorType?
+        do {
+            actualValue = (try reader.optionalValueAtPath("arf") { throw $0 }) ?? invalid
+            actualError = nil
+        } catch {
+            actualValue = invalid
+            actualError = error
+        }
+
+        //Then
+        XCTAssertEqual(actualValue, expectedValue)
+        XCTAssertNotNil(actualError)
+    }
+
+
+    func testOptionalValueAtPathWithValueOfWrongType() {
+        //Given
+        let key = "foo"
+        let value = true
+        let dict = [key: value]
+        let expectedValue = Optional<String>.None
+        let reader = JSONReader(object: dict)
+
+        //When
+        let actualError: ErrorType?
+        let actualValue: String?
+        do {
+            actualValue = try reader.optionalValueAtPath("foo") { throw $0 }
+            actualError = nil
+        } catch {
+            actualValue = nil
+            actualError = error
+        }
+
+        //Then
+        XCTAssertEqual(actualValue, expectedValue)
+        XCTAssertNotNil(actualError)
+    }
+
+
+    func testOptionalValueAtPathNullSubstitutionBehaviourTrue() {
+        //Given
+        let key = "foo"
+        let value = NSNull()
+        let dict = [key: value]
+        let expected: NSNull? = nil
+        let reader = JSONReader(object: dict)
+
+        //When
+        let actual: NSNull? = reader.optionalValueAtPath("foo", substituteNSNullWithNil: true)
+
+        //Then
+        XCTAssertEqual(actual, expected)
+    }
+
+
+    func testOptionalValueAtPathNullSubstitutionBehaviourFalse() {
+        //Given
+        let key = "foo"
+        let value = NSNull()
+        let dict = [key: value]
+        let expected: NSNull? = value
+        let reader = JSONReader(object: dict)
+
+        //When
+        let actual: NSNull? = reader.optionalValueAtPath("foo", substituteNSNullWithNil: false)
+
+        //Then
+        XCTAssertEqual(actual, expected)
+    }
+
+
+    /*
 
     @rethrows public func valueAtPath<T>(path: JSONPath, errorHandler: (JSONPathError) throws -> T) rethrows -> T
 
@@ -340,6 +432,6 @@ class JSONReaderJSONPathTests: XCTestCase {
     @rethrows public func readerAtPath(path: JSONPath, errorHandler: (JSONPathError) throws -> JSONReader = default) rethrows -> JSONReader.JSONReader
 */
 
-
+    //TODO: Test errors are of expected value
     //TODO: 64 bit number edge cases
 }
