@@ -20,10 +20,10 @@ public final class JSONReader: Equatable {
     
     
     /// The object to attempt to fetch values from
-    public let object: Any?
-    
+    public let rootValue: Any?
+
     public var isEmpty: Bool {
-        return object == nil
+        return rootValue == nil
     }
     
     
@@ -32,66 +32,45 @@ public final class JSONReader: Equatable {
     convenience public init(data: NSData, allowFragments: Bool = false) throws {
         let options: NSJSONReadingOptions = allowFragments ? [NSJSONReadingOptions.AllowFragments] : []
         let object = try NSJSONSerialization.JSONObjectWithData(data, options: options)
-        self.init(object: object)
+        self.init(rootValue: object)
     }
-    
-    
-    public init(object: Any?) {
-        self.object = object
+
+
+    public init(rootValue: Any?) {
+        self.rootValue = rootValue
     }
+
     
-    
-    private convenience init() {
-        self.init(object: nil)
-    }
-    
-    
-    //MARK:- Value access
+    //MARK:- root value access
     
     public func value<T>() -> T? {
-        return object as? T
+        return rootValue as? T
     }
-    
-    
-    public func value<T>(errorHandler: (JSONReader.Error) throws -> T) rethrows -> T {
-        guard object != nil else {
-            let error = Error.MissingValue
-            return try errorHandler(error)
-        }
-        
-        guard let value = object as? T else {
-            let error = Error.UnexpectedType(expectedType: T.self, actualType: object.dynamicType)
-            return try errorHandler(error)
-        }
-        
-        return value
-    }
-    
+
     
     //MARK:- Element access
     
     public func isValidIndex(relativeIndex: Int) -> Bool {
-        guard let array = object as? NSArray else {
+        guard let array = rootValue as? NSArray else {
             return false
         }
         
         return array.absoluteIndexForRelativeIndex(relativeIndex) != nil
     }
-    
-    
+
     
     public subscript(relativeIndex: Int) -> JSONReader {
-        guard let array = object as? NSArray,
+        guard let array = rootValue as? NSArray,
             let index = array.absoluteIndexForRelativeIndex(relativeIndex) else {
-                return JSONReader()
+                return JSONReader(rootValue: nil)
         }
         
-        return JSONReader(object: array[index])
+        return JSONReader(rootValue: array[index])
     }
     
     
     public func isValidKey(key: String) -> Bool {
-        guard let collection = object as? NSDictionary else {
+        guard let collection = rootValue as? NSDictionary else {
             return false
         }
         
@@ -100,12 +79,12 @@ public final class JSONReader: Equatable {
     
     
     public subscript(key: String) -> JSONReader {
-        guard let collection = object as? NSDictionary,
+        guard let collection = rootValue as? NSDictionary,
             let element = collection[key] else {
-                return JSONReader()
+                return JSONReader(rootValue: nil)
         }
         
-        return JSONReader(object: element)
+        return JSONReader(rootValue: element)
     }
 }
 
@@ -113,7 +92,7 @@ public final class JSONReader: Equatable {
 //MARK:- JSONPath extension
 
 extension JSONReader {
-    
+
     public enum JSONPathError: ErrorType {
         public typealias JSONPathComponentsStack = [(JSONPath.Component, Any?)]
         case UnexpectedType(path: JSONPath, componentStack: JSONPathComponentsStack, Any.Type)
@@ -122,142 +101,67 @@ extension JSONReader {
         case InvalidSubscript(path: JSONPath, componentStack: JSONPathComponentsStack)
         case MissingValue(path: JSONPath)
     }
-    
-    
-    //MARK:- Optional value fetching
-    
-    public func optionalValueAtPath<T>(path: JSONPath, substituteNSNullWithNil: Bool = true) -> T? {
-        return optionalValueAtPath(path, substituteNSNullWithNil: substituteNSNullWithNil, errorHandler: { _ in return nil })
-    }
-    
-    
-    public func optionalValueAtPath<T>(path: JSONPath, substituteNSNullWithNil: Bool = true, errorHandler: ((JSONPathError) throws -> T?)) rethrows -> T? {
-        var untypedValue: Any? = object
+
+
+    //MARK: Value fetching
+
+    public func valueAtPath<T>(path: JSONPath, terminalNSNullSubstitution nullSubstitution: T? = nil) throws -> T {
+        var untypedValue: Any? = rootValue
         var componentsErrorStack = JSONPathError.JSONPathComponentsStack()
-        
+
         for component in path.components {
             componentsErrorStack.append((component, untypedValue))
-            
+
             switch component {
             case .SelfReference:
                 break
-                
+
             case .Numeric(let number):
                 //Check the collection is valid
                 guard let array = untypedValue as? NSArray else {
-                    let error = JSONPathError.UnexpectedType(path: path, componentStack: componentsErrorStack, NSArray.self)
-                    return try errorHandler(error)
+                    throw JSONPathError.UnexpectedType(path: path, componentStack: componentsErrorStack, NSArray.self)
                 }
-                
+
                 //Check the index is valid
                 guard let index = array.absoluteIndexForRelativeIndex(Int(number)) else {
-                    //TODO: The erro should be invalidIndex
-                    let error = JSONPathError.InvalidSubscript(path: path, componentStack: componentsErrorStack)
-                    return try errorHandler(error)
+                    //TODO: The error should be invalidIndex
+                    throw JSONPathError.InvalidSubscript(path: path, componentStack: componentsErrorStack)
+
                 }
                 untypedValue = array[index]
-                
+
             case .Text(let key):
                 guard let dict = untypedValue as? NSDictionary else {
-                    let error = JSONPathError.UnexpectedType(path: path, componentStack: componentsErrorStack, NSDictionary.self)
-                    return try errorHandler(error)
+                    throw JSONPathError.UnexpectedType(path: path, componentStack: componentsErrorStack, NSDictionary.self)
                 }
-                
+
                 //Check the index is valid
                 guard let element = dict[key] else {
-                    let error = JSONPathError.InvalidSubscript(path: path, componentStack: componentsErrorStack)
-                    return try errorHandler(error)
+                    throw JSONPathError.InvalidSubscript(path: path, componentStack: componentsErrorStack)
                 }
                 untypedValue = element
             }
         }
-        
-        if untypedValue == nil //This can only occur when the rootObject is nil and the path consists only of .SelfReference
-            || (substituteNSNullWithNil && untypedValue is NSNull) {
-                return nil
+
+        if untypedValue is NSNull {
+            untypedValue = nullSubstitution
         }
-        
+
         guard let value = untypedValue as? T else {
-            let error = JSONPathError.UnexpectedType(path: path, componentStack: componentsErrorStack, T.self)
-            return try errorHandler(error)
+            throw JSONPathError.UnexpectedType(path: path, componentStack: componentsErrorStack, T.self)
         }
         
         return value
     }
-    
-    
-    //MARK: Non-optional value fetching
-    
-    public func valueAtPath<T>(path: JSONPath, errorHandler: (JSONPathError) throws -> T) rethrows -> T {
-        
-        guard let value = try optionalValueAtPath(path, substituteNSNullWithNil: false, errorHandler: { try errorHandler($0) }) else {
-            //- if nil -> missing value error and return
-            return try errorHandler(.MissingValue(path: path))
-        }
-        return value
-    }
-    
-    
-    public func valueAtPath<T>(path: JSONPath, defaultValue: T) -> T {
-        return valueAtPath(path, errorHandler: {_ in return defaultValue })
-    }
-    
-    
-    public func valueAtPath<T>(path: JSONPath) throws -> T {
-        return try valueAtPath(path, errorHandler: {throw $0})
-    }
-    
-    
+
+
     //MARK:- Reader fetching
-    
-    public func readerAtPath(path: JSONPath, errorHandler: (JSONPathError) throws -> JSONReader = { throw $0 } ) rethrows -> JSONReader {
-        let value: Any? = try optionalValueAtPath(path, substituteNSNullWithNil: false, errorHandler: errorHandler)
-        guard let object = value else {
-            return try errorHandler(.MissingValue(path: path))
-        }
-        
-        return JSONReader(object: object)
-    }
-}
 
+    public func readerAtPath(path: JSONPath) throws -> JSONReader {
+        let value = try valueAtPath(path) as Any
 
-public func ==(lhs: JSONReader, rhs: JSONReader) -> Bool {
-    
-    if lhs.isEmpty && rhs.isEmpty {
-        return true
+        return JSONReader(rootValue: value)
     }
-    
-    if let
-        left:  NSArray = lhs.value(),
-        right: NSArray = rhs.value() {
-            return left == right
-    }
-    
-    if let
-        left:  NSDictionary = lhs.value(),
-        right: NSDictionary = rhs.value() {
-            return left == right
-    }
-    
-    if let
-        left:  NSString = lhs.value(),
-        right: NSString = rhs.value() {
-            return left == right
-    }
-    
-    if let
-        left:  NSNull = lhs.value(),
-        right: NSNull = rhs.value() {
-            return left == right
-    }
-    
-    if let
-        left:  NSNumber = lhs.value(),
-        right: NSNumber = rhs.value() {
-            return left == right
-    }
-    
-    return false
 }
 
 
@@ -275,4 +179,144 @@ extension NSArray {
         return isInRange ? index : nil
     }
     
+}
+
+
+//MARK:- Depreacted methods
+
+extension JSONReader {
+
+    @available(*, deprecated=0.5, renamed="init(rootValue:)")
+    public convenience init(object: Any?) {
+        self.init(rootValue: object)
+    }
+
+
+    @available(*, deprecated=0.5, renamed="rootValue")
+    public var object: Any? {
+        return rootValue
+    }
+
+
+    @available(*, deprecated=0.5)
+    public func valueAtPath<T>(path: JSONPath, errorHandler: (JSONPathError) throws -> T) rethrows -> T {
+
+        guard let value = try optionalValueAtPath(path, substituteNSNullWithNil: false, errorHandler: { try errorHandler($0) }) else {
+            //- if nil -> missing value error and return
+            return try errorHandler(.MissingValue(path: path))
+        }
+        return value
+    }
+
+
+    @available(*, deprecated=0.5)
+    public func valueAtPath<T>(path: JSONPath, defaultValue: T) -> T {
+        return valueAtPath(path, errorHandler: {_ in return defaultValue })
+    }
+
+
+    @available(*, deprecated=0.5)
+    public func readerAtPath(path: JSONPath, errorHandler: (JSONPathError) throws -> JSONReader = { throw $0 } ) rethrows -> JSONReader {
+        let value: Any? = try optionalValueAtPath(path, substituteNSNullWithNil: false, errorHandler: errorHandler)
+        guard let object = value else {
+            return try errorHandler(.MissingValue(path: path))
+        }
+
+        return JSONReader(object: object)
+    }
+
+
+    @available(*, deprecated=0.5)
+    public func value<T>(errorHandler: (JSONReader.Error) throws -> T) rethrows -> T {
+        guard object != nil else {
+            let error = Error.MissingValue
+            return try errorHandler(error)
+        }
+
+        guard let value = object as? T else {
+            let error = Error.UnexpectedType(expectedType: T.self, actualType: object.dynamicType)
+            return try errorHandler(error)
+        }
+
+        return value
+    }
+
+
+    @available(*, deprecated=0.5)
+    public func optionalValueAtPath<T>(path: JSONPath, substituteNSNullWithNil: Bool = true) -> T? {
+        return optionalValueAtPath(path, substituteNSNullWithNil: substituteNSNullWithNil, errorHandler: { _ in return nil })
+    }
+
+
+    @available(*, deprecated=0.5)
+    public func optionalValueAtPath<T>(path: JSONPath, substituteNSNullWithNil: Bool = true, errorHandler: ((JSONPathError) throws -> T?)) rethrows -> T? {
+        var untypedValue: Any? = object
+        var componentsErrorStack = JSONPathError.JSONPathComponentsStack()
+
+        for component in path.components {
+            componentsErrorStack.append((component, untypedValue))
+
+            switch component {
+            case .SelfReference:
+                break
+
+            case .Numeric(let number):
+                //Check the collection is valid
+                guard let array = untypedValue as? NSArray else {
+                    let error = JSONPathError.UnexpectedType(path: path, componentStack: componentsErrorStack, NSArray.self)
+                    return try errorHandler(error)
+                }
+
+                //Check the index is valid
+                guard let index = array.absoluteIndexForRelativeIndex(Int(number)) else {
+                    //TODO: The erro should be invalidIndex
+                    let error = JSONPathError.InvalidSubscript(path: path, componentStack: componentsErrorStack)
+                    return try errorHandler(error)
+                }
+                untypedValue = array[index]
+
+            case .Text(let key):
+                guard let dict = untypedValue as? NSDictionary else {
+                    let error = JSONPathError.UnexpectedType(path: path, componentStack: componentsErrorStack, NSDictionary.self)
+                    return try errorHandler(error)
+                }
+
+                //Check the index is valid
+                guard let element = dict[key] else {
+                    let error = JSONPathError.InvalidSubscript(path: path, componentStack: componentsErrorStack)
+                    return try errorHandler(error)
+                }
+                untypedValue = element
+            }
+        }
+
+        if untypedValue == nil //This can only occur when the rootObject is nil and the path consists only of .SelfReference
+            || (substituteNSNullWithNil && untypedValue is NSNull) {
+            return nil
+        }
+
+        guard let value = untypedValue as? T else {
+            let error = JSONPathError.UnexpectedType(path: path, componentStack: componentsErrorStack, T.self)
+            return try errorHandler(error)
+        }
+
+        return value
+    }
+}
+
+
+@available(*, deprecated=0.5)
+public func ==(lhs: JSONReader, rhs: JSONReader) -> Bool {
+
+    if lhs.isEmpty && rhs.isEmpty {
+        return true
+    }
+
+    if
+        let left = lhs.object as? NSObject,
+        let right = rhs.object as? NSObject {
+        return left == right
+    }
+
+    return false
 }

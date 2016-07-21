@@ -303,6 +303,7 @@
 		8213FABE1BEE48B5006B64CE /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				FRAMEWORK_VERSION = 0.5;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -310,6 +311,7 @@
 		8213FABF1BEE48B5006B64CE /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				FRAMEWORK_VERSION = 0.5;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
