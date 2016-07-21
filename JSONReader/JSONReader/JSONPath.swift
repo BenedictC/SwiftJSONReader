@@ -15,23 +15,12 @@ JSONPath represents a path through a tree of JSON objects.
 TODO: Write a grammer of a path
 
 */
-public struct JSONPath: Equatable {
+public struct JSONPath {
 
-    public enum Component: Equatable {
+    public enum Component {
         case Text(String)
         case Numeric(Int64)
         case SelfReference
-
-        private func asTuple()-> (text: String?, number: Int64?, isSelfReference: Bool) {
-            switch self {
-            case .Text(let text):
-                return (text, nil, false)
-            case .Numeric(let number):
-                return (nil, number, false)
-            case .SelfReference:
-                return (nil, nil, true)
-            }
-        }
     }
 
     public let components: [Component]
@@ -45,7 +34,35 @@ public struct JSONPath: Equatable {
 }
 
 
+//MARK:- Equatable
+
+extension JSONPath: Equatable {
+
+}
+
+
+public func ==(lhs: JSONPath, rhs: JSONPath) -> Bool {
+    return lhs.components == rhs.components
+}
+
+
+extension JSONPath.Component: Equatable {
+
+    private func asTuple()-> (text: String?, number: Int64?, isSelfReference: Bool) {
+        switch self {
+        case .Text(let text):
+            return (text, nil, false)
+        case .Numeric(let number):
+            return (nil, number, false)
+        case .SelfReference:
+            return (nil, nil, true)
+        }
+    }
+}
+
+
 public func ==(lhs: JSONPath.Component, rhs: JSONPath.Component) -> Bool {
+
     let lhsValues = lhs.asTuple()
     let rhsValues = rhs.asTuple()
 
@@ -55,8 +72,61 @@ public func ==(lhs: JSONPath.Component, rhs: JSONPath.Component) -> Bool {
 }
 
 
-public func ==(lhs: JSONPath, rhs: JSONPath) -> Bool {
-    return lhs.components == rhs.components
+//MARK:- Debug Description
+
+extension JSONPath: CustomDebugStringConvertible {
+
+    public var debugDescription: String {
+        var description = ""
+
+        for component in components {
+            switch component {
+            case .Text(let text):
+                description += "['\(text)']"
+                break
+
+            case .Numeric(let number):
+                description += "[\(number)]"
+
+            case .SelfReference:
+                description += "[self]"
+            }
+        }
+
+        return description
+    }
+}
+
+
+extension JSONPath.Component: CustomDebugStringConvertible {
+
+    public var debugDescription: String {
+        switch self {
+        case .Numeric(let i):
+            return "[\(i)]"
+        case .SelfReference:
+            return "[self]"
+        case .Text(let text):
+            return encodeStringAsSubscriptRepresentation(text)
+        }
+    }
+
+    private func encodeStringAsSubscriptRepresentation(text: String) -> String {
+        let mutableText =  NSMutableString(string: text)
+        //Note that the order of the replacements is significant. We must replace '`' first otherwise our replacements will get replaced.
+        mutableText.replaceOccurrencesOfString("`", withString: "``", options: [], range: NSRange(location: 0, length: mutableText.length))
+        mutableText.replaceOccurrencesOfString("'", withString: "`'", options: [], range: NSRange(location: 0, length: mutableText.length))
+
+        return "['\(mutableText)']"
+    }
+}
+
+
+extension JSONPath {
+    //deprecated
+    public static func encodeTextAsSubscriptPathComponent(text: String) -> String {
+        return JSONPath.Component.Text(text).debugDescription
+    }
 }
 
 
@@ -97,7 +167,7 @@ extension JSONPath {
             if stop { return }
 
             //Prepare for next loop
-            componentIdx++
+            componentIdx += 1
 
         } while !scanner.atEnd
 
@@ -243,43 +313,57 @@ extension JSONPath {
     /// A cache of the values of each component of a path. The key is the path and the value is an array of NSNumber, NSString and NSNull which represent .Numeric, .Text and .SelfReference respectively.
     private static let componentsCache = NSCache()
 
+
+    private static func componentsForStringRepresentation(string: String) -> [Component]? {
+        guard let foundationComponents = JSONPath.componentsCache.objectForKey(string) as? [AnyObject] else {
+            return nil
+        }
+        let components = foundationComponents.map({ object -> Component in
+            //The cache can't store enums so we have to map back from AnyObject
+            switch object {
+            case is NSNumber:
+                return Component.Numeric(object.longLongValue)
+
+            case is NSString:
+                return Component.Text(object as! String)
+
+            case is NSNull:
+                return Component.SelfReference
+
+            default:
+                fatalError("Unexpected type in component cache.")
+            }
+        })
+        return components
+    }
+
+
+    private static func setComponents(components: [Component], forStringRepresentation string: String) {
+        //We can't store an array of enums in an NSCache so we map to an array of AnyObject.
+        let FoundationComponents = components.map({ component -> AnyObject in
+            switch component {
+            case .Numeric(let number):
+                return NSNumber(longLong: number)
+
+            case .Text(let text):
+                return NSString(string: text)
+
+            case .SelfReference:
+                return NSNull()
+            }
+        })
+        JSONPath.componentsCache.setObject(FoundationComponents, forKey: string)
+    }
+
+
     public init(path: String) throws {
         let components: [Component]
 
-        if let cachedComponents = JSONPath.componentsCache.objectForKey(path) as? [AnyObject] {
-            //The cache can't store enums so we have to map back from AnyObject
-            components = cachedComponents.map({ object -> Component in
-                switch object {
-                case is NSNumber:
-                    return Component.Numeric(object.longLongValue)
-
-                case is NSString:
-                    return Component.Text(object as! String)
-
-                case is NSNull:
-                    return Component.SelfReference
-
-                default:
-                    fatalError("Unexpected type in component cache.")
-                }
-            })
+        if let cachedComponents = JSONPath.componentsForStringRepresentation(path) {
+            components = cachedComponents
         } else {
             components = try JSONPath.componentsInPath(path)
-
-            //We can't store an array of enums in an NSCache so we map to an array of AnyObject.
-            let componentsArray = components.map({ component -> AnyObject in
-                switch component {
-                case .Numeric(let number):
-                    return NSNumber(longLong: number)
-
-                case .Text(let text):
-                    return NSString(string: text)
-
-                case .SelfReference:
-                    return NSNull()
-                }
-            })
-            JSONPath.componentsCache.setObject(componentsArray, forKey: path)
+            JSONPath.setComponents(components, forStringRepresentation: path)
         }
 
         self.init(components: components)
@@ -319,53 +403,5 @@ extension JSONPath: StringLiteralConvertible {
         } catch let error {
             fatalError("String literal does not represent a valid JSONPath. Error: \(error)")
         }
-    }
-}
-
-
-//MARK:- Description
-
-extension JSONPath: CustomDebugStringConvertible {
-    
-    public var debugDescription: String {
-        var description = ""
-        
-        for component in components {
-            switch component {
-            case .Text(let text):
-                description += "['\(text)']"
-                break
-                
-            case .Numeric(let number):
-                description += "[\(number)]"
-                
-            case .SelfReference:
-                description += "[self]"
-            }
-        }
-        
-        return description
-    }
-}
-
-
-//MARK:- String encoding
-
-extension JSONPath {
-
-    /**
-    <#Description#>
-
-    - parameter text: <#text description#>
-
-    - returns: <#return value description#>
-    */
-    public static func encodeTextAsSubscriptPathComponent(text: String) -> String {
-        let mutableText =  NSMutableString(string: text)
-        //Note that the order of the replacements is significant. We must replace '`' first otherwise our replacements will get replaced.
-        mutableText.replaceOccurrencesOfString("`", withString: "``", options: [], range: NSRange(location: 0, length: mutableText.length))
-        mutableText.replaceOccurrencesOfString("'", withString: "`'", options: [], range: NSRange(location: 0, length: mutableText.length))
-
-        return "['\(mutableText)']"
     }
 }
