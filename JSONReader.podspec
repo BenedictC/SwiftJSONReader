@@ -76,7 +76,7 @@ JSONReader provides type checked access to a JSON object using JSON paths. JSONR
   #  Supports git, hg, bzr, svn and HTTP.
   #
 
-  s.source       = { :git => "https://github.com/benedictc/SwiftJSONReader.git", :tag => "0.4" }
+  s.source       = { :git => "https://github.com/benedictc/SwiftJSONReader.git", :tag => "0.5" }
 
 
   # ――― Source Code ―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――― #
