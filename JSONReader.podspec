@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "JSONReader"
-  s.version      = "0.4"
+  s.version      = "0.5"
   s.summary      = "JSONReader is a handy class for type checked access to JSON data using JSON paths."
 
   # This description is used to generate tags and improve search results.
