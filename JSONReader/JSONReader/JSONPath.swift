@@ -123,7 +123,7 @@ extension JSONPath.Component: CustomDebugStringConvertible {
 
 
 extension JSONPath {
-    //deprecated
+    @available(*, deprecated=0.5, message="Use JSONPath.Component.debugDescription instead.")
     public static func encodeTextAsSubscriptPathComponent(text: String) -> String {
         return JSONPath.Component.Text(text).debugDescription
     }
