@@ -22,9 +22,9 @@ let reader = JSONReader(rootValue:
 
 let value0: String = reader["arf"].value() ?? ""
 
-let value1 = try? reader.valueAtPath("foo.bar.arf1") ?? "default2"
-let value2 = try? reader.valueAtPath("foo['bar'].arf2") ?? "default2"
-let value3: String  = try reader.valueAtPath("arf")
+let value1 = try? reader.value(at: "foo.bar.arf1") ?? "default2"
+let value2 = try? reader.value(at: "foo['bar'].arf2") ?? "default2"
+let value3: String  = try reader.value(at: "arf")
 
 //print(value1, value2, value3)
 

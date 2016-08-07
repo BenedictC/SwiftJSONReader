@@ -157,14 +157,16 @@
 		8213FAAE1BEE48B5006B64CE /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0700;
+				LastUpgradeCheck = 0800;
 				ORGANIZATIONNAME = "Benedict Cohen";
 				TargetAttributes = {
 					8213FAB51BEE48B5006B64CE = {
 						CreatedOnToolsVersion = 7.0;
+						LastSwiftMigration = 0800;
 					};
 					82BCE5611C1843CC00FF87AA = {
 						CreatedOnToolsVersion = 7.0;
+						LastSwiftMigration = 0800;
 					};
 				};
 			};
@@ -305,6 +307,7 @@
 			buildSettings = {
 				FRAMEWORK_VERSION = 0.5;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -313,6 +316,8 @@
 			buildSettings = {
 				FRAMEWORK_VERSION = 0.5;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};
@@ -326,6 +331,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = uk.co.benedictcohen.JSONReaderTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
+				SWIFT_VERSION = 3.0;
 			};
 			name = Debug;
 		};
@@ -339,6 +345,8 @@
 				PRODUCT_BUNDLE_IDENTIFIER = uk.co.benedictcohen.JSONReaderTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = macosx;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
+				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
 		};

@@ -13,15 +13,15 @@ class JSONReaderTests: XCTestCase {
 
     func testObjectProperty() {
         //Given
-        let reader = JSONReader(object: [])
+        let reader = JSONReader(rootValue: [])
 
         //Valid object
-        XCTAssertNotNil(reader.object)
+        XCTAssertNotNil(reader.rootValue)
         XCTAssertFalse(reader.isEmpty)
 
         //InvalidObject
-        let emptyReader = JSONReader(object: nil)
-        XCTAssertNil(emptyReader.object)
+        let emptyReader = JSONReader(rootValue: nil)
+        XCTAssertNil(emptyReader.rootValue)
         XCTAssertTrue(emptyReader.isEmpty)
     }
 
@@ -29,11 +29,11 @@ class JSONReaderTests: XCTestCase {
     func testInitWithJSONValidData() {
         //Given
         let expected = ["foo": "bar"] as NSDictionary
-        let data = (try? NSJSONSerialization.dataWithJSONObject(expected, options: [])) ?? NSData()
+        let data = (try? JSONSerialization.data(withJSONObject: expected, options: [])) ?? Data()
 
         //When
         let reader = try? JSONReader(data: data)
-        let actual: NSDictionary = (reader?.object as? NSDictionary) ?? NSDictionary()
+        let actual: NSDictionary = (reader?.rootValue as? NSDictionary) ?? NSDictionary()
 
         //Then
         XCTAssertEqual(actual, expected)
@@ -42,7 +42,7 @@ class JSONReaderTests: XCTestCase {
 
     func testInitWithJSONInvalidData() {
         //Given
-        let data = NSData()
+        let data = Data()
 
         //When
         let reader = try? JSONReader(data: data)
@@ -55,11 +55,11 @@ class JSONReaderTests: XCTestCase {
     func testInitWithJSONDataWithFragmentTrue() {
         //Given
         let expected = NSNull()
-        let data = "null".dataUsingEncoding(NSUTF8StringEncoding)!
+        let data = "null".data(using: String.Encoding.utf8)!
 
         //When
         let reader = try? JSONReader(data: data, allowFragments: true)
-        let actual = reader?.object as? NSNull
+        let actual = reader?.rootValue as? NSNull
 
         //Then
         if let actual = actual {
@@ -72,7 +72,7 @@ class JSONReaderTests: XCTestCase {
 
     func testInitWithJSONDataWithFragmentFalse() {
         //Given
-        let data = "null".dataUsingEncoding(NSUTF8StringEncoding)!
+        let data = "null".data(using: String.Encoding.utf8)!
 
         //When
         let reader = try? JSONReader(data: data, allowFragments: false)
@@ -85,7 +85,7 @@ class JSONReaderTests: XCTestCase {
     func testValue() {
         //Given
         let expected: Float = 4.5
-        let reader = JSONReader(object: expected)
+        let reader = JSONReader(rootValue: expected)
 
         //When
         let actual = reader.value() as Float?
@@ -95,50 +95,10 @@ class JSONReaderTests: XCTestCase {
     }
 
 
-
-    func testValueWithErrorHandlerHappy() {
-        //Given
-        let expected: Double = 800
-        let reader = JSONReader(object: expected)
-
-        //When
-        let actual = reader.value() { error in
-            return expected * -1
-        }
-
-        //Then
-        XCTAssertEqual(actual, expected)
-    }
-
-
-    func testValueWithErrorHandlerWrongType() {
-        //Given
-        let expected: Double = 800
-        let reader = JSONReader(object: expected)
-
-        //When
-        let actualError: ErrorType?
-        let actualValue: String?
-        do {
-            actualValue = try reader.value() { error -> String in throw error }
-            actualError = nil
-        } catch {
-            actualValue = nil
-            actualError = error
-        }
-
-        //Then
-        XCTAssertNil(actualValue)
-        XCTAssertNotNil(actualError)
-
-        //TODO: Test error is of expect type
-    }
-
-
     func testIsValidPositiveIndex() {
         //Given
         let array = [0,1,2]
-        let reader = JSONReader(object: array)
+        let reader = JSONReader(rootValue: array)
 
         //When
         let actual = reader.isValidIndex(array.count - 1)
@@ -152,7 +112,7 @@ class JSONReaderTests: XCTestCase {
     func testIsInvalidPositiveIndex() {
         //Given
         let array = [0,1,2]
-        let reader = JSONReader(object: array)
+        let reader = JSONReader(rootValue: array)
 
         //When
         let actual = reader.isValidIndex(Int.max)
@@ -166,7 +126,7 @@ class JSONReaderTests: XCTestCase {
     func testIsValidNegativeIndex() {
         //Given
         let array = [0,1,2]
-        let reader = JSONReader(object: array)
+        let reader = JSONReader(rootValue: array)
 
         //When
         let actual = reader.isValidIndex(-array.count)
@@ -180,7 +140,7 @@ class JSONReaderTests: XCTestCase {
     func testIsInvalidNegativeIndex() {
         //Given
         let array = [0,1,2]
-        let reader = JSONReader(object: array)
+        let reader = JSONReader(rootValue: array)
 
         //When
         let actual = reader.isValidIndex(Int.min)
@@ -194,13 +154,13 @@ class JSONReaderTests: XCTestCase {
     func testValidPositiveNumericSubscript() {
         //Given
         let array = ["zero", "one", "two"]
-        let reader = JSONReader(object: array)
+        let reader = JSONReader(rootValue: array)
 
         //When
-        let actual = reader[0]
+        let actual = reader[0].rootValue as? NSObject
 
         //Then
-        let expected = JSONReader(object: array.first!)
+        let expected = JSONReader(rootValue: array.first!).rootValue as? NSObject
         XCTAssertEqual(actual, expected)
     }
 
@@ -208,13 +168,13 @@ class JSONReaderTests: XCTestCase {
     func testInvalidPositiveNumericSubscript() {
         //Given
         let array = ["zero", "one", "two"]
-        let reader = JSONReader(object: array)
+        let reader = JSONReader(rootValue: array)
 
         //When
-        let actual = reader[Int.max]
+        let actual = reader[Int.max].rootValue as? NSObject
 
         //Then
-        let expected = JSONReader(object: nil)
+        let expected = JSONReader(rootValue: nil).rootValue as? NSObject
         XCTAssertEqual(actual, expected)
     }
 
@@ -222,13 +182,13 @@ class JSONReaderTests: XCTestCase {
     func testValidNegativeNumericSubscript() {
         //Given
         let array = ["zero", "one", "two"]
-        let reader = JSONReader(object: array)
+        let reader = JSONReader(rootValue: array)
 
         //When
-        let actual = reader[-array.count]
+        let actual = reader[-array.count].rootValue as? NSObject
 
         //Then
-        let expected = JSONReader(object: array.first!)
+        let expected = JSONReader(rootValue: array.first!).rootValue as? NSObject
         XCTAssertEqual(actual, expected)
     }
 
@@ -236,13 +196,13 @@ class JSONReaderTests: XCTestCase {
     func testInvalidNegativeNumericSubscript() {
         //Given
         let array = ["zero", "one", "two"]
-        let reader = JSONReader(object: array)
+        let reader = JSONReader(rootValue: array)
 
         //When
-        let actual = reader[Int.min]
+        let actual = reader[Int.min].rootValue as? NSObject
 
         //Then
-        let expected = JSONReader(object: nil)
+        let expected = JSONReader(rootValue: nil).rootValue as? NSObject
         XCTAssertEqual(actual, expected)
     }
 
@@ -254,7 +214,7 @@ class JSONReaderTests: XCTestCase {
         let key = "foo"
         let value = "bar"
         let dict = [key: value]
-        let reader = JSONReader(object: dict)
+        let reader = JSONReader(rootValue: dict)
 
         //When
         let actual = reader.isValidKey(key)
@@ -270,7 +230,7 @@ class JSONReaderTests: XCTestCase {
         let key = "foo"
         let value = "bar"
         let dict = [key: value]
-        let reader = JSONReader(object: dict)
+        let reader = JSONReader(rootValue: dict)
 
         //When
         let unhappyKey = "asgrdhf"
@@ -287,13 +247,13 @@ class JSONReaderTests: XCTestCase {
         let key = "foo"
         let value = "bar"
         let dict = [key: value]
-        let reader = JSONReader(object: dict)
+        let reader = JSONReader(rootValue: dict)
 
         //When
-        let actual = reader[key]
+        let actual = reader[key].rootValue as? NSObject
 
         //Then
-        let expected = JSONReader(object: value)
+        let expected = JSONReader(rootValue: value).rootValue as? NSObject
         XCTAssertEqual(actual, expected)
     }
 
@@ -303,14 +263,14 @@ class JSONReaderTests: XCTestCase {
         let key = "foo"
         let value = "bar"
         let dict = [key: value]
-        let reader = JSONReader(object: dict)
+        let reader = JSONReader(rootValue: dict)
 
         //When
         let unhappyKey = "aegrsetwr"
-        let actual = reader[unhappyKey]
+        let actual = reader[unhappyKey].rootValue as? NSObject
 
         //Then
-        let expected = JSONReader(object: nil)
+        let expected = JSONReader(rootValue: nil).rootValue as? NSObject
         XCTAssertEqual(actual, expected)
     }
 }
@@ -318,175 +278,18 @@ class JSONReaderTests: XCTestCase {
 
 class JSONReaderJSONPathTests: XCTestCase {
 
-    func testOptionalValueAtPathWithValidValue() {
-        //Given
-        let key = "foo"
-        let value = "bar"
-        let dict = [key: value]
-        let invalid = "invalid"
-        let expected = value
-        let reader = JSONReader(object: dict)
-
-        //When
-        let actual = reader.optionalValueAtPath("foo") ?? invalid
-
-        //Then
-        XCTAssertEqual(actual, expected)
-    }
-
-
-    func testOptionalValueAtPathWithMissingValue() {
-        //Given
-        let key = "foo"
-        let value = 500
-        let dict = [key: value]
-        let invalid = "invalid"
-        let expectedValue = invalid
-        let reader = JSONReader(object: dict)
-
-        //When
-        let actualValue: String
-        let actualError: ErrorType?
-        do {
-            actualValue = (try reader.optionalValueAtPath("arf") { throw $0 }) ?? invalid
-            actualError = nil
-        } catch {
-            actualValue = invalid
-            actualError = error
-        }
-
-        //Then
-        XCTAssertEqual(actualValue, expectedValue)
-        XCTAssertNotNil(actualError)
-    }
-
-
-    func testOptionalValueAtPathWithValueOfWrongType() {
-        //Given
-        let key = "foo"
-        let value = true
-        let dict = [key: value]
-        let expectedValue = Optional<String>.None
-        let reader = JSONReader(object: dict)
-
-        //When
-        let actualError: ErrorType?
-        let actualValue: String?
-        do {
-            actualValue = try reader.optionalValueAtPath("foo") { throw $0 }
-            actualError = nil
-        } catch {
-            actualValue = nil
-            actualError = error
-        }
-
-        //Then
-        XCTAssertEqual(actualValue, expectedValue)
-        XCTAssertNotNil(actualError)
-    }
-
-
-    func testOptionalValueAtPathNullSubstitutionBehaviourTrue() {
-        //Given
-        let key = "foo"
-        let value = NSNull()
-        let dict = [key: value]
-        let expected: NSNull? = nil
-        let reader = JSONReader(object: dict)
-
-        //When
-        let actual: NSNull? = reader.optionalValueAtPath("foo", substituteNSNullWithNil: true)
-
-        //Then
-        XCTAssertEqual(actual, expected)
-    }
-
-
-    func testOptionalValueAtPathNullSubstitutionBehaviourFalse() {
-        //Given
-        let key = "foo"
-        let value = NSNull()
-        let dict = [key: value]
-        let expected: NSNull? = value
-        let reader = JSONReader(object: dict)
-
-        //When
-        let actual: NSNull? = reader.optionalValueAtPath("foo", substituteNSNullWithNil: false)
-
-        //Then
-        XCTAssertEqual(actual, expected)
-    }
-
-
-    func testValueAtPathWithErrorHandlerHappy() {
-        //Given
-        let key = "foo"
-        let value = "bar"
-        let dict = [key: value]
-        let expected = value
-        let invalid = value + value
-        let reader = JSONReader(object: dict)
-
-        //When
-        let actual: String = reader.valueAtPath("foo", errorHandler: {error in return invalid})
-
-        //Then
-        XCTAssertEqual(actual, expected)
-    }
-
-
-    func testValueAtPathWithErrorHandlerMissingValue() {
-        //Given
-        let key = "foo"
-        let value = "bar"
-        let dict = [key: value]
-        let invalid = value + value
-        let expected = invalid
-        let reader = JSONReader(object: dict)
-
-        //When
-        let actual: String = reader.valueAtPath("aegrsbf", errorHandler: {error in return invalid})
-
-        //Then
-        XCTAssertEqual(actual, expected)
-    }
-
-
-    func testValueAtPathWithErrorHandlerWrongType() {
-        //Given
-        let key = "foo"
-        let value = 876543
-        let dict = [key: value]
-        let invalid = "invalid"
-        let expected = invalid
-        let reader = JSONReader(object: dict)
-
-        //When
-        let actual: String = reader.valueAtPath("aegrsbf", errorHandler: {error in return invalid})
-
-        //Then
-        XCTAssertEqual(actual, expected)
-    }
-
-
-    func testValueAtPathWithDefaultValue() {
-        //TODO: Happy path
-        //TODO: Missing value
-        //TODO: Wrong type
-    }
-
 
     func testReaderAtPathValid() {
         //Given
         let value = true
         let dict = ["key": value]
-        let reader = JSONReader(object: dict)
+        let reader = JSONReader(rootValue: dict)
 
         //When
-        let actual = (try? reader.readerAtPath("key")) ?? JSONReader(object: nil)
+        let actual = (try? reader.reader(at:"key"))?.rootValue as? NSObject ?? JSONReader(rootValue: nil).rootValue as? NSObject
 
         //Then
-        let expected = JSONReader(object: value)
+        let expected = JSONReader(rootValue: value).rootValue as? NSObject
         XCTAssertEqual(actual, expected)
     }
 
@@ -494,13 +297,13 @@ class JSONReaderJSONPathTests: XCTestCase {
     func testReaderAtPathInvalid() {
         //Given
         let dict = ["key": "value"]
-        let reader = JSONReader(object: dict)
+        let reader = JSONReader(rootValue: dict)
 
         //When
         let actual: JSONReader?
-        let actualError: ErrorType?
+        let actualError: ErrorProtocol?
         do {
-            actual = try reader.readerAtPath("arf")
+            actual = try reader.reader(at: "arf")
             actualError = nil
         } catch {
             actualError = error

@@ -67,15 +67,15 @@ extension JSONPathTestWrapper: ArrayLiteralConvertible {
         for literal in elements {
             switch literal {
             case is String:
-                components.append(JSONPath.Component.Text(literal as! String))
+                components.append(JSONPath.Component.text(literal as! String))
 
             case is Int:
                 let int = literal as! Int
                 let number = Int64(int)
-                components.append(JSONPath.Component.Numeric(number))
+                components.append(JSONPath.Component.numeric(number))
 
             case is NSNull:
-                components.append(JSONPath.Component.SelfReference)
+                components.append(JSONPath.Component.selfReference)
 
             default:
                 fatalError("Invalid literal")
