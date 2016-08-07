@@ -8,19 +8,16 @@
 
 import Foundation
 
-typealias Error = ErrorProtocol
 
+//MARK:- Errors
+
+public enum JSONReaderError: Error {
+    case missingValue
+    case unexpectedType(expectedType: Any.Type, actualType: Any.Type)
+}
 
 
 public final class JSONReader {
-
-    //MARK:- Errors
-
-    public enum Error: ErrorProtocol {
-        case missingValue
-        case unexpectedType(expectedType: Any.Type, actualType: Any.Type)
-    }
-
 
     /// The object to attempt to fetch values from
     public let rootValue: Any?
@@ -102,7 +99,7 @@ extension JSONReader {
 
 extension JSONReader {
 
-    public enum JSONPathError: ErrorProtocol {
+    public enum JSONPathError: Error {
         public typealias JSONPathComponentsStack = [(JSONPath.Component, Any?)]
         case unexpectedType(path: JSONPath, componentStack: JSONPathComponentsStack, Any.Type)
         case invalidSubscript(path: JSONPath, componentStack: JSONPathComponentsStack)

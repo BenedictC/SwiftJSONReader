@@ -155,7 +155,7 @@ extension JSONPath.Component: CustomDebugStringConvertible {
 
 extension JSONPath {
 
-    public enum ParsingError: ErrorProtocol {
+    public enum ParsingError: Error {
         //TODO: Add details to these errors (location, expect input etc)
         case expectedComponent
         case invalidSubscriptValue
@@ -173,7 +173,7 @@ extension JSONPath {
     }
 
 
-    public static func enumerateComponentsInPath(_ JSONPath: String, enumerator: (component: Component, componentIdx: Int, inout stop: Bool) throws -> Void) throws {
+    public static func enumerateComponentsInPath(_ JSONPath: String, enumerator: (component: Component, componentIdx: Int, stop: inout Bool) throws -> Void) throws {
 
         let scanner = Scanner(string: JSONPath)
         scanner.charactersToBeSkipped = nil //Don't skip whitespace!
@@ -335,7 +335,7 @@ extension JSONPath {
 
     /// A cache of the values of each component of a path. 
     //The key is the path and the value is an array of NSNumber, NSString and NSNull which represent .numeric, .text and .selfReference respectively.
-    private static let componentsCache = Cache<NSString, NSArray>()
+    private static let componentsCache = NSCache<NSString, NSArray>()
 
 
     private static func componentsForStringRepresentation(_ string: String) -> [Component]? {
@@ -401,7 +401,7 @@ extension JSONPath {
 
 //MARK:- StringLiteralConvertible
 
-extension JSONPath: StringLiteralConvertible {
+extension JSONPath: ExpressibleByStringLiteral {
 
     public init(stringLiteral path: StringLiteralType) {
         do {

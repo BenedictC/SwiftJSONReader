@@ -301,7 +301,7 @@ class JSONReaderJSONPathTests: XCTestCase {
 
         //When
         let actual: JSONReader?
-        let actualError: ErrorProtocol?
+        let actualError: Error?
         do {
             actual = try reader.reader(at: "arf")
             actualError = nil

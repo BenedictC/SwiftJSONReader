@@ -24,7 +24,7 @@ func ==(lhs: JSONPathTestWrapper, rhs: JSONPathTestWrapper) -> Bool {
 }
 
 
-extension JSONPathTestWrapper: StringLiteralConvertible {
+extension JSONPathTestWrapper: ExpressibleByStringLiteral {
 
     init(stringLiteral path: StringLiteralType) {
         let jsonPath = try? JSONPath(path: path)
@@ -58,7 +58,7 @@ extension JSONPathTestWrapper: StringLiteralConvertible {
 }
 
 
-extension JSONPathTestWrapper: ArrayLiteralConvertible {
+extension JSONPathTestWrapper: ExpressibleByArrayLiteral {
     typealias Element = AnyObject
 
     init(arrayLiteral elements:JSONPathTestWrapper.Element...) {
