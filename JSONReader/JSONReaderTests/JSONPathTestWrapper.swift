@@ -59,7 +59,7 @@ extension JSONPathTestWrapper: ExpressibleByStringLiteral {
 
 
 extension JSONPathTestWrapper: ExpressibleByArrayLiteral {
-    typealias Element = AnyObject
+    typealias Element = Any
 
     init(arrayLiteral elements:JSONPathTestWrapper.Element...) {
 
