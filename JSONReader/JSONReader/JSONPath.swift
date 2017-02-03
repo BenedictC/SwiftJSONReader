@@ -101,7 +101,7 @@ public func ==(lhs: JSONPath, rhs: JSONPath) -> Bool {
 
 extension JSONPath.Component: Equatable {
 
-    private func asTuple()-> (text: String?, number: Int64?, isSelfReference: Bool) {
+    fileprivate func asTuple()-> (text: String?, number: Int64?, isSelfReference: Bool) {
         switch self {
         case .text(let text):
             return (text, nil, false)
@@ -164,7 +164,7 @@ extension JSONPath {
     }
 
 
-    private static func componentsInPath(_ path: String) throws -> [Component] {
+    fileprivate static func componentsInPath(_ path: String) throws -> [Component] {
         var components = [Component]()
         try JSONPath.enumerateComponentsInPath(path) { component, componentIdx, stop in
             components.append(component)
@@ -173,7 +173,7 @@ extension JSONPath {
     }
 
 
-    public static func enumerateComponentsInPath(_ JSONPath: String, enumerator: (component: Component, componentIdx: Int, stop: inout Bool) throws -> Void) throws {
+    public static func enumerateComponentsInPath(_ JSONPath: String, enumerator: (_ component: Component, _ componentIdx: Int, _ stop: inout Bool) throws -> Void) throws {
 
         let scanner = Scanner(string: JSONPath)
         scanner.charactersToBeSkipped = nil //Don't skip whitespace!
@@ -184,7 +184,7 @@ extension JSONPath {
             let component = try scanComponent(scanner)
             //Call the enumerator
             var stop = false
-            try enumerator(component: component, componentIdx: componentIdx, stop: &stop)
+            try enumerator(component, componentIdx, &stop)
             if stop { return }
 
             //Prepare for next loop
@@ -339,7 +339,7 @@ extension JSONPath {
 
 
     private static func componentsForStringRepresentation(_ string: String) -> [Component]? {
-        guard let foundationComponents = JSONPath.componentsCache.object(forKey: string) as? [AnyObject] else {
+        guard let foundationComponents = JSONPath.componentsCache.object(forKey: string as NSString) as? [AnyObject] else {
             return nil
         }
         let components = foundationComponents.map({ object -> Component in
@@ -364,7 +364,7 @@ extension JSONPath {
 
     private static func setComponents(_ components: [Component], forStringRepresentation string: String) {
         //We can't store an array of enums in an NSCache so we map to an array of AnyObject.
-        let FoundationComponents = components.map({ component -> AnyObject in
+        let foundationComponents = components.map({ component -> AnyObject in
             switch component {
             case .numeric(let number):
                 return NSNumber(value: number)
@@ -376,7 +376,7 @@ extension JSONPath {
                 return NSNull()
             }
         })
-        JSONPath.componentsCache.setObject(FoundationComponents, forKey: string)
+        JSONPath.componentsCache.setObject(foundationComponents as NSArray, forKey: string as NSString)
     }
 
 

@@ -170,9 +170,9 @@ extension JSONReader {
 
 //MARK:- Array index additions
 
-extension NSArray {
+fileprivate extension NSArray {
 
-    private func absoluteIndexForRelativeIndex(_ relativeIndex: Int) -> Int? {
+    func absoluteIndexForRelativeIndex(_ relativeIndex: Int) -> Int? {
 
         let count = self.count
         let shouldInvertIndex = relativeIndex < 0
